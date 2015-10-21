@@ -13,7 +13,7 @@ def runSanityChecks(origName,newName):
 						 newName - The new file name.
 	"""
 	#check 1
-	newNameWithoutAddedPrefix =  newName.lsplit("_",1)[1]
+	newNameWithoutAddedPrefix =  newName.split("_",1)[1]
 	if newNameWithoutAddedPrefix != origName:
 		raise Exception("Failed Sanity check 1 - The new file name '{newName}' minus the added prefix '{newNameWithoutAddedPrefix}' does not match the orig filename '{origName}' !".format(newName=newName,newNameWithoutAddedPrefix=newNameWithoutAddedPrefix,origName=origName))
 
@@ -90,4 +90,5 @@ for origName in names:
 	if not stdout:
 		Exception("Can't find file '{origName}' in order to rename it.")
 	print("Renaming '{stdout}' to '{newName}'".format(stdout=stdout,newName=names[origName]))
-	os.rename(stdout,names[origName])
+	renameTo = os.path.join(os.path.dirname(stdout),names[origName])
+	os.rename(stdout,renameTo)
