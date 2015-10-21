@@ -1,5 +1,6 @@
-# cirm
-CIRM related projects
+# CESCG
+CESCG related projects
 
-The California Institute for Regenerative Medicine (CIRM) 
-See the CIRM wiki at https://cirm-cescg.wikispaces.com.
+The Center for Excellence in Stem Cell Genomics (CESCG) was formed by a grant from the California Institute for Regenerative Medicine (CIRM) 
+
+See the CESCG wiki at https://cirm-cescg.wikispaces.com.
