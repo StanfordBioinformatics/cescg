@@ -6,16 +6,16 @@ from argparse import ArgumentParser
 
 whiteSpaceReg = re.compile(r'\s')
 
-def runSanityChecks(oldName,newName):
+def runSanityChecks(origName,newName):
 	"""
-	Function : Perform a few sanity checks, such as the new file name without the added prefix is equal to the old file name."
-	Args     : oldName - The original file name.
+	Function : Perform a few sanity checks, such as the new file name without the added prefix is equal to the orig file name."
+	Args     : origName - The original file name.
 						 newName - The new file name.
 	"""
 	#check 1
-	newNameWithoutAddedPrefix =  newName.lsplit("_",1)[1]
-	if newNameWithoutAddedPrefix != oldName:
-		raise Exception("Failed Sanity check 1 - The new file name '{newName}' minus the added prefix '{newNameWithoutAddedPrefix}' does not match the old filename '{oldName}' !".format(newName=newName,newNameWithoutAddedPrefix=newNameWithoutAddedPrefix,oldName=oldName))
+	newNameWithoutAddedPrefix =  newName.split("_",1)[1]
+	if newNameWithoutAddedPrefix != origName:
+		raise Exception("Failed Sanity check 1 - The new file name '{newName}' minus the added prefix '{newNameWithoutAddedPrefix}' does not match the orig filename '{origName}' !".format(newName=newName,newNameWithoutAddedPrefix=newNameWithoutAddedPrefix,origName=origName))
 
 def validateFileName(filename):
 	"""
@@ -30,12 +30,12 @@ def validateFileName(filename):
 description = "Renames FASTQ files based on the original and new name pairings found in the tab-delimited input file. The names should not contain paths. The listing of original file names must be unique, likewise for the listing of new files names. If not, then an Exception is raised."
 
 parser = ArgumentParser(description=description)
-parser.add_argument('-i','--infile',required=True,help="The input tab-delimited file. Must contain a column for the original file name and another for the new file name, where each row forms an old name and new name pair. The file names should not include paths.")
+parser.add_argument('-i','--infile',required=True,help="The input tab-delimited file. Must contain a column for the original file name and another for the new file name, where each row forms an orig name and new name pair. The file names should not include paths.")
 parser.add_argument('-a','--original-name-column',type=int,required=True,help="The 1-base index of the column position that contains the FASTQ files names as output by the SCGPM pipeline (raw file names).")
 parser.add_argument('-b','--new-name-column',type=int,required=True,help="The 1-base index of the column that contains the new FASTQ file names.")
 parser.add_argument('-s','--base-search-dir',required=True,help="The starting directory in which to search for the file names in --infile designated by column position --original-name-column.")
 parser.add_argument('--header',action="store_true",help="Presence of this option indicates that there is a header line as the first line in --infile, and should be ignored.")
-parser.add_argument('--sanity-check',action="store_true",help="Presence of this option indicates to perform a few sanity checks, such as the new file name without the added prefix is equal to the old file name.")
+parser.add_argument('--sanity-check',action="store_true",help="Presence of this option indicates to perform a few sanity checks, such as the new file name without the added prefix is equal to the orig file name.")
 
 args = parser.parse_args()
 infile = args.infile
@@ -73,14 +73,14 @@ for line in fh:
 		raise Exception("File name '{newName}' in column position {col} exists multiple times!".format(col=newNameCol + 1))
 	names[origName] = newName
 	if sanityCheck:
-		runSanityChecks(oldName,newName)
+		runSanityChecks(origName,newName)
 
-#now see if I can find each occurrence of oldName 
+#now see if I can find each occurrence of origName 
 
 
 os.chdir(startingDir)
-for oldName in names:
-	cmd = "find . -name {oldName} -print".format(oldName=oldName)
+for origName in names:
+	cmd = "find . -name {origName} -print".format(origName=origName)
 	popen = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE) #checkRetcode=False b/c the 'find' cmd doesn't error if it doens't find anything.
 	stdout,stderr = popen.communicate()
 	stdout = stdout.strip()
@@ -89,6 +89,7 @@ for oldName in names:
 	if retcode:
 		print("Command '{cmd}' failed with return code '{retcode}'. \n\nSTDOUT was '{stdout}'. \n\nSTDERR was '{stderr}'".format(cmd=cmd,retcode=retcode,stdout=stdout,stderr=stderr))
 	if not stdout:
-		Exception("Can't find file '{oldName}' in order to rename it.")
-	print("Renaming '{stdout}' to '{newName}'".format(stdout=stdout,newName=names[oldName]))
-	os.rename(stdout,names[oldName])
+		Exception("Can't find file '{origName}' in order to rename it.")
+	print("Renaming '{stdout}' to '{newName}'".format(stdout=stdout,newName=names[origName]))
+	renameTo = os.path.join(os.path.dirname(stdout),names[origName])
+	os.rename(stdout,renameTo)
