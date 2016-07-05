@@ -27,7 +27,8 @@ def validateFileName(filename):
 		raise Exception("Filename '{filename}' contains a '/' character, which is not supported by this script.".format(filename=filename))	
 
 
-description = "Renames FASTQ files based on the original and new name pairings found in the tab-delimited input file. The names should not contain paths."
+description = "Renames FASTQ files based on the original and new name pairings found in the tab-delimited input file. The names should not contain paths. The listing of original file names must be unique, likewise for the listing of new files names. If not, then an Exception is raised."
+
 parser = ArgumentParser(description=description)
 parser.add_argument('-i','--infile',required=True,help="The input tab-delimited file. Must contain a column for the original file name and another for the new file name, where each row forms an old name and new name pair. The file names should not include paths.")
 parser.add_argument('-a','--original-name-column',type=int,required=True,help="The 1-base index of the column position that contains the FASTQ files names as output by the SCGPM pipeline (raw file names).")
