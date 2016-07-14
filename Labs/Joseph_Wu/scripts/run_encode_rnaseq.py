@@ -1,7 +1,28 @@
 #!/bin/env python
+# -*- coding: utf-8 -*-
 
 import dxpy
 import pdb
+
+#There are 5 patients. Each patient was barcoded, and given 3 two treatments of medicine (different doses) and one control (no medicine). Each of the patients was sequenced in replicate on two lanes of a HiSeq 4000 - lanes 1 and 5. The goal is to run the ENCODE long RNA-Seq pipeline on each treatment and control condition for each patient. Each time I run the pipeline, I will specify the replicates - two forward read files and two reverse read files.
+
+#The following table is part of the metadata that was provided and is stored in the DNAnexus project named Joseph_Wu (project-BxZpbXj0V610b5Q6x1FV80gb).
+#Sample Group Condition Index 
+#287 #1a  HCM No Treatment  ATTACTCG-AGGCTATA
+#287 #1b  HCM Pravastatin 0.1 µM ATTACTCG-GCCTCTATC
+#287 #1c  HCM Pravastatin 1 µM ATTACTCG-AGGATAGGT
+#289 #1a  HCM No Treatment  ATTACTCG-TAAGATTA
+#289 #1b  HCM Pravastatin 0.1 µM ATTACTCG-ACGTCCTGC
+#289 #1c  HCM Pravastatin 1 µM ATTACTCG-GTCAGTACG
+#295 #1a  HCM No Treatment  TCCGGAGA-AGGATAGG
+#295 #1b  HCM Pravastatin 0.1 µM TCCGGAGA-TCAGAGCCA
+#295 #1c  HCM Pravastatin 1 µM TCCGGAGA-CTTCGCCTG
+#297 #1a  Control No Treatment  TCCGGAGA-TAAGATTA
+#297 #1b  Control Pravastatin 0.1 µM TCCGGAGA-ACGTCCTGC
+#297 #1c  Control Pravastatin 1 µM TCCGGAGA-GTCAGTACG
+#301 #1a  Control No Treatment  CGCTCATT-AGGCTATA
+#301 #1b  Control Pravastatin 0.1 µM CGCTCATT-GCCTCTATC
+#301 #1c  Control Pravastatin 1 µM CGCTCATT-AGGATAGGT
 
 joseph_wu_dx_project_id = "project-BxZpbXj0V610b5Q6x1FV80gb"
 encode_long_rnaseq_wf = dxpy.DXWorkflow(project=joseph_wu_dx_project_id,dxid="workflow-By2Yq7j0V6119PjY2VyxY7Xy") #wfid stands for workflow ID
@@ -37,10 +58,10 @@ def createFileDict(lane_objects):
 
 def verifyLaneDict(dico,lane):
 	"""
+	Function : Verifies that the dictionary created by createFileDict() has 3 barcodes per patient that that each barcode has a forward and reverse reads file.
 	Args: dico - A dict. returned by the function createFileDict().
 				lane - int. The lane number represented by dico (in this program, that's either 1 or 5.
 	"""
-	
 	for patient_id in dico:
 		#check that each patient has 3 barcodes
 		patient_barcodes = dico[patient_id].keys()
