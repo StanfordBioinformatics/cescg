@@ -28,6 +28,14 @@ joseph_wu_dx_project_id = "project-BxZpbXj0V610b5Q6x1FV80gb"
 encode_long_rnaseq_wf = dxpy.DXWorkflow(project=joseph_wu_dx_project_id,dxid="workflow-By2Yq7j0V6119PjY2VyxY7Xy") #wfid stands for workflow ID
 star_genome_index_with_ercc = dxpy.dxlink(project_id=joseph_wu_dx_project_id,object_id="file-Bxv6kJj0Vb9vKZq9G5gX0ffk")
 
+chrom_sizes_file = dxpy.dxlink(project_id=joseph_wu_dx_project_id,object_id="file-Bxykpq00V610j3287Vyyyj3J")
+#chrom_sizes_file has two columns:
+	#1) chromosome name
+	#2) chromosome size
+#The chromosomes making up the chrom_sizes_file come from the star genome index, and includes the ERCC92 data set.
+
+rsem_index = dxpy.dxlink(project_id=joseph_wu_dx_project_id,object_id="file-Bxyp5zj0Kf6F7K2b546XPk17")
+
 
 def createFileDict(lane_objects):
 	"""
@@ -98,11 +106,11 @@ for patient_id in lane1_dico:
 		lane5_r = dxpy.dxlink(lane5_dico[patient_id][barcode]["reverse"]["dxid"])
 		destination_folder = "/encode_long_rnaseq/{patient_id}/{barcode}".format(patient_id=patient_id,barcode=barcode)
 		project.new_folder(folder=destination_folder,parents=True) #no return value
-		workflow_input = { "0.reads1":[lane1_f,lane5_f],"0.reads2":[lane1_r,lane5_r],"0.star_index":star_genome_index_with_ercc}
+		workflow_input = { "0.reads1":[lane1_f,lane5_f],"0.reads2":[lane1_r,lane5_r],"0.star_index":star_genome_index_with_ercc,"1.chrom_sizes":chrom_sizes_file,"2.rsem_index":rsem_index}
 		job_name = "_".join([patient_id,barcode,encode_long_rnaseq_wf.id])
 		#run the wf
 		job_properties = {"patient_id":patient_id,"barcode":barcode}
-		encode_long_rnaseq_wf.run(workflow_input=workflow_input,project=joseph_wu_dx_project_id,folder=destination_folder,name=job_name,properties=job_properties)
+		encode_long_rnaseq_wf.run(debug={"debugOn":["AppError","AppInternalError"],workflow_input=workflow_input,project=joseph_wu_dx_project_id,folder=destination_folder,name=job_name,properties=job_properties)
 		#cmd = "dx run --ssh --debug-on AppError,AppInternalError --destination {destination} " + encode_long_rnaseq_wfid + " -istage-BxFZK780VBPvq9FbXQFYz4gG.reads1={lane1_f} -istage-BxFZK780VBPvq9FbXQFYz4gG.reads1={lane5_f} \
 		#				-istage-BxFZK780VBPvq9FbXQFYz4gG.reads2={lane1_r} -istage-BxFZK780VBPvq9FbXQFYz4gG.reads2={lane5_r} \
 		#				-istage-BxFZK780VBPvq9FbXQFYz4gG.star_index={star_genome_index_with_ercc}".format(destination=destination,lane1_f=lane1_f,lane5_f=lane5_f,lane1_r=lane1_r,lane5_r=lane5_r,star_genome_index_with_ercc=star_genome_index_with_ercc)
