@@ -52,7 +52,8 @@ HOSTNAME = socket.gethostname()
 
 
 description = "Accepts DNAnexus projects pending transfer to the CESCG org, then downloads each of the projects to the local host at {output_dir}.".format(output_dir=OUTPUT_DIR)
-description += " For each successfully transfer project that is downloaded, an email will sent out to {addr} for notification.".format(addr=SUCCESS_EMAIL)
+description += " For each successfully transfer project that is downloaded, an email will sent out to {addr} for notification,".format(addr=SUCCESS_EMAIL)
+description == " and in DNAnexus a project property will be added to the project; this property is 'scHub' and will be set to True to indicate that the project was downloaded to SCHub."
 description += " For each download that fails, and email will be sent out to {addrs} for notification.".format(addrs=",".join(ERROR_EMAILS))
 description += " See more details at https://docs.google.com/document/d/1ykBa2D7kCihzIdixiOFJiSSLqhISSlqiKGMurpW5A6s/edit?usp=sharing and https://docs.google.com/a/stanford.edu/document/d/1AxEqCr4dWyEPBfp2r8SMtz8YE_tTTme730LsT_3URdY/edit?usp=sharing."
 
@@ -79,6 +80,8 @@ for proj_id in transferred:
 		logger.info(body)
 		subject = "CESCG: New DNAnexus SeqResults for {proj_name}".format(proj_name=proj.name)
 		subprocess.check_call("echo {body} | mail -s {subject} {TO}".format(body=body,subject=subject,TO=SUCCESS_EMAIL))
+		proj_properties.update({"scHub":True})
+		dxpy.api.project_set_properties(object_id=proj_id,input_params={"properties": proj_properties})
 	except Exception as e:
 		logger.exception(e.message)
 		logger.critical("Sending email with exception details to {}".format(ERROR_EMAILS))
