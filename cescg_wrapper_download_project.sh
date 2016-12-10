@@ -72,7 +72,7 @@ do
 	lab=$(dx describe ${dx_proj_id} --verbose --json | jq -r .properties.lab)
 
 	lab_dir=${output_dir}/${lab}	
-	if ![[ -d ${lab_dir} ]]
+	if [[ ! -d ${lab_dir} ]]
 	then
 		mkdir ${lab_dir}
 	fi
