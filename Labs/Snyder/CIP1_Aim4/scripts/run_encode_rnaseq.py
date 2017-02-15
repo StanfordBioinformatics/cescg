@@ -24,6 +24,9 @@ import pdb
 #301 #1b  Control Pravastatin 0.1 µM CGCTCATT-GCCTCTATC
 #301 #1c  Control Pravastatin 1 µM CGCTCATT-AGGATAGGT
 
+#This dataset is stored in DNAnexus under the org org-cescg. For each FASTQ file, I added a property in DNAnexus named patent, and the value being the first column in the table above, minus the leading '#'. For example. patient=287.
+#I'll run the ENCODE Uniform Long RNA-Seq pipeline and output the results in the same project and in the folder path Joseph_Wu/encode_long_rnaseq/. Within that folder, there will be a subfolder named after each patient ID, i.e. 287, and a sub-folder there-within named after the barcode. 
+
 joseph_wu_dx_project_id = "project-BxZpbXj0V610b5Q6x1FV80gb"
 encode_long_rnaseq_wf = dxpy.DXWorkflow(project=joseph_wu_dx_project_id,dxid="workflow-By2Yq7j0V6119PjY2VyxY7Xy") #wfid stands for workflow ID
 star_genome_index_with_ercc = dxpy.dxlink(project_id=joseph_wu_dx_project_id,object_id="file-Bxv6kJj0Vb9vKZq9G5gX0ffk")
