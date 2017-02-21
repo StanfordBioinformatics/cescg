@@ -3,7 +3,9 @@ Nathaniel Watson
 nathankw@stanford.edu
 
 
-The ENCODE Long RNA-Seq workflow was run in the DNAnexus project project-BxZpbXj0V610b5Q6x1FV80gb (Joseph_Wu) for each of the samples.
+The ENCODE Long RNA-Seq workflow was run in the DNAnexus project project-BxZpbXj0V610b5Q6x1FV80gb (Joseph_Wu) for each of the 48 samples/barcodes. The command to run the analysis was:
+
+python run_encode_rnaseq.py -g hg19 -t 6 -s project-F0bv6b00k49KxZvfGQG3v3qQ project-F0bxzXj0kgYq5Qzf9jp4fVB0 project-F0bz9GQ0FggyF151x0BQg678 project-F07jGX00P0By6yk2ZkFqVz06 project-F0bJ2bj05gbXG139J83jv49z project-F0b4Z3002Pf29FK60bqX7bg6  -w project-BxZpbXj0V610b5Q6x1FV80gb -b /srv/gsfs0/software/gbsc/cescg/Labs/Snyder/Part2_CIP1_Aim4/barcodes.txt
 
 #There are 12 patients. Each was sequenced under the following 4 conditions:
 	#iPSC
@@ -11,7 +13,7 @@ The ENCODE Long RNA-Seq workflow was run in the DNAnexus project project-BxZpbXj
 	#Prevastatin, 0.1 uM
 	#Carvedilol, 0.1 uM
 
-#For each patient, for each sample, I need to run the ENCODE Long RNA-Seq pipeline on hg38. Then, I'll need to run EBSeq (rsem-run-ebseq) to calculate both gene and isoform differential expression of each medicine dose
+#For each patient, for each sample, I need to run the ENCODE Long RNA-Seq pipeline on hg19. Then, I'll need to run EBSeq (rsem-run-ebseq) to calculate both gene and isoform differential expression of each medicine dose
 # against the 'No Treatment' sample. I can ignore the iPSC sample I'm told, but I'll go ahead and map it. 
 
 #Each sample was sequenced 6 times. That is, the same barcode was sequenced in 6 lanes. They are the following 6 DNAnexus projects:
@@ -23,7 +25,6 @@ The ENCODE Long RNA-Seq workflow was run in the DNAnexus project project-BxZpbXj
 #	161107_GADGET_0078_BHFNKGBBXX_L5_SW03-11-02-16 (project-F0b4Z3002Pf29FK60bqX7bg6)
 
 #When running the ENCODE pipeline, I'll run it for all 6 technical replicates at the same time.
-
 
 #Note that for each of the FASTQ files in DNAnexus, I added three properties:
 	#1) lab_patient_id
