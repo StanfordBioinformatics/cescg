@@ -1,6 +1,7 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import argparse 
 import pdb
 
@@ -18,6 +19,7 @@ parser.add_argument("-g","--genome",required=True,choices=(HG19,HG38),help="The 
 parser.add_argument("-w","--working-dx-proj",required=True,help="The ID of the DNAnexus project in which to run the ENCODE Long RNA-Seq workflow. You must have previously copied the workflow into this project in the root folder.")
 parser.add_argument("-s","--sequencing_projects",required=True,nargs="+",help="The DNAnexus projects that contain the sequencing results.")
 parser.add_argument("-b","--barcodes-file",required=True,help="Text file containing one or more barcodes (one per line).")
+parser.add_argument("-d","--output_path",required=True,help="The output folder prefix path in --working-dx-proj to write the reslults to.")
 parser.add_argument("-t","--technical-replicates",required=True,type=int,help="""The number of technical replicates for each sample (barcode). Each technical replicate should have the same barcode since it was sequenced multiple times - either on multiple lanes of the same flowcell, or different lanes of different flowcells, or both. This information is used to perform a check before running the workflow. The check asserts the following for each sample:
 	#forward_read_fiels == #num_reverse_read_files == #technical_replicates
 """)
@@ -29,6 +31,11 @@ sequencing_projects = args.sequencing_projects
 barcodes_file = args.barcodes_file
 num_tech_reps = args.technical_replicates
 
+output_path = args.output_path
+if not output_path.startswith("/"):
+	output_path = "/" + output_path
+
+
 bfh = open(barcodes_file)
 barcodes = []
 for line in bfh:
@@ -39,7 +46,7 @@ for line in bfh:
 
 #When copying the ENCODE Long RNA-Seq workflow into a DNAnexus projects, in addition to copying the workflow object, the copy action also copies over the STAR and RSEM tarballs for the genome indices, as well as the chromosome sizes file. It only does this for hg38, because ENCODE created a STAR and RSEM index already using the applets prep-star and prep-rsem, respectively. I created my own hg19 index using these same applets, which live in my nathankw_resources project. Thus, if the genome to use is hg38, we'll find the relevent files in the $working_proj project, but if it is hg19, we'll find them in the nathankw_resources project.
 
-encode_long_rnaseq_wf = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=working_proj,name="ENCODE RNA-Seq (Long) Pipeline - 1 (paired-end) replicate"))
+encode_long_rnaseq_wf = dxpy.DXWorkflow(dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=working_proj,name="ENCODE RNA-Seq (Long) Pipeline - 1 (paired-end) replicate")))
 
 if genome == HG38:
 	encode_star_index = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=working_proj,name="GRCh38_v24pri_tRNAs_ERCC_phiX_starIndex.tgz")) #hg38 (extracts to 'out' folder)
@@ -133,14 +140,14 @@ for barcode in barcodes_dico:
 	elif len(forward_files) != num_tech_reps:
 		raise Exception("For barcode {barcode}, there aren't {reps} FASTQ files.".format(barcode=barcode,reps=num_tech_reps))
 
-	destination_folder = "/encode_long_rnaseq/{patient_id}/{barcode}".format(patient_id=patient_id,barcode=barcode)
+	destination_folder = os.path.join(output_path,patient_id,barcode)
 	current_project.new_folder(folder=destination_folder,parents=True) #no return value
 	workflow_input = { "0.reads1":forward_files,"0.reads2":reverse_files,"0.star_index":encode_star_index,"1.chrom_sizes":chrom_sizes_file,"2.rsem_index":encode_rsem_index}
 	job_name = "_".join([patient_id,barcode,encode_long_rnaseq_wf.id])
 #		#run the wf
 	job_properties = {"lab_patient_id":patient_id,"barcode":barcode}
 	encode_long_rnaseq_wf.run(debug={"debugOn":["AppError","AppInternalError"]},workflow_input=workflow_input,project=working_proj,folder=destination_folder,name=job_name,properties=job_properties)
-	break
+#	break
 #		#cmd = "dx run --ssh --debug-on AppError,AppInternalError --destination {destination} " + encode_long_rnaseq_wfid + " -istage-BxFZK780VBPvq9FbXQFYz4gG.reads1={lane1_f} -istage-BxFZK780VBPvq9FbXQFYz4gG.reads1={lane5_f} \
 #		#				-istage-BxFZK780VBPvq9FbXQFYz4gG.reads2={lane1_r} -istage-BxFZK780VBPvq9FbXQFYz4gG.reads2={lane5_r} \
 #		#				-istage-BxFZK780VBPvq9FbXQFYz4gG.star_index={encode_star_index}".format(destination=destination,lane1_f=lane1_f,lane5_f=lane5_f,lane1_r=lane1_r,lane5_r=lane5_r,star_genome_index_with_ercc=star_genome_index_with_ercc)
