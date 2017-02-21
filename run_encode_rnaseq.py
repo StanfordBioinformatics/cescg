@@ -10,7 +10,7 @@ from scgpm_seqresults_dnanexus import dnanexus_utils as du #module load gbsc/scg
 
 HG19 = "hg19"
 HG38 = "hg38"
-NATHANKW_RESOURCES_PROJ= "project-BxxYqbQ0v3VQz5z2bvFyF6YV"
+ENCODE_PROJ_ID= "project-BKpvFg00VBPV975PgJ6Q03v6"
 
 description = ""
 parser = argparse.ArgumentParser(description=description,formatter_class=argparse.RawTextHelpFormatter)
@@ -47,9 +47,9 @@ if genome == HG38:
 	chrom_sizes_file = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=working_proj,name="GRCh38_EBV.chrom.sizes"))
 
 elif genome == HG19:
-	encode_star_index = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=NATHANKW_RESOURCES_PROJ,name="GRCh38_v24pri_tRNAs_ERCC_phiX_starIndex.tgz")) #hg38 (extracts to 'out' folder)
-	encode_rsem_index = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=NATHANKW_RESOURCES_PROJ,name="hg19_v19_SRM2374_Sequence_v1_rsemIndex.tgz")) #hg38 (extracts to 'out' folder)
-	chrom_sizes_file = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=NATHANKW_RESOURCES_PROJ,name="GRCh38_EBV.chrom.sizes"))
+	encode_star_index = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=ENCODE_PROJ_ID,name="hg19_male_v19_ERCC_starIndex.tgz"))
+	encode_rsem_index = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=ENCODE_PROJ_ID,name="hg19_male_v19_ERCC_rsemIndex.tgz"))
+	chrom_sizes_file = dxpy.dxlink(dxpy.find_one_data_object(more_ok=False,project=ENCODE_PROJ_ID,name="male.hg19.chrom.sizes"))
 
 else:
 	raise Exception("Unsupported genome {genome}.".format(genome=genome))
