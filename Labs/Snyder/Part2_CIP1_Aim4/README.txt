@@ -5,7 +5,7 @@ nathankw@stanford.edu
 
 The ENCODE Long RNA-Seq workflow was run in the DNAnexus project project-BxZpbXj0V610b5Q6x1FV80gb (Joseph_Wu) for each of the 48 samples/barcodes. The command to run the analysis was:
 
-python run_encode_rnaseq.py -g hg19 -t 6 -s project-F0bv6b00k49KxZvfGQG3v3qQ project-F0bxzXj0kgYq5Qzf9jp4fVB0 project-F0bz9GQ0FggyF151x0BQg678 project-F07jGX00P0By6yk2ZkFqVz06 project-F0bJ2bj05gbXG139J83jv49z project-F0b4Z3002Pf29FK60bqX7bg6  -w project-BxZpbXj0V610b5Q6x1FV80gb -b /srv/gsfs0/software/gbsc/cescg/Labs/Snyder/Part2_CIP1_Aim4/barcodes.txt
+python run_encode_rnaseq.py -g hg19 -t 6 -d "encode_long_rnaseq/part2_cip1_aim4" -s project-F0bv6b00k49KxZvfGQG3v3qQ project-F0bxzXj0kgYq5Qzf9jp4fVB0 project-F0bz9GQ0FggyF151x0BQg678 project-F07jGX00P0By6yk2ZkFqVz06 project-F0bJ2bj05gbXG139J83jv49z project-F0b4Z3002Pf29FK60bqX7bg6  -w project-BxZpbXj0V610b5Q6x1FV80gb -b /srv/gsfs0/software/gbsc/cescg/Labs/Snyder/Part2_CIP1_Aim4/barcodes.txt
 
 #There are 12 patients. Each was sequenced under the following 4 conditions:
 	#iPSC
