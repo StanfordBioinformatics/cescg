@@ -1,8 +1,6 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
-python run_encode_rnaseq.py -s project-F0b1P4Q04fx48f2yk1j3gG61 project-F0bJ3Xj03jJF87gf94X2fv8F -w	project-F2YpBxQ0721Fjp343Q7bQKXx -b /srv/gsfs0/software/gbsc/cescg/Labs/Loring/barcodes.txt
-
 import argparse 
 import pdb
 
@@ -18,11 +16,11 @@ description = ""
 parser = argparse.ArgumentParser(description=description,formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("-g","--genome",required=True,choices=(HG19,HG38),help="The reference genome to use in the analysis.")
 parser.add_argument("-w","--working-dx-proj",required=True,help="The ID of the DNAnexus project in which to run the ENCODE Long RNA-Seq workflow. You must have previously copied the workflow into this project in the root folder.")
-parser.add_argument("-s","--sequencing_projects",required=True,narg="+",help="The DNAnexus projects that contain the sequencing results.")
+parser.add_argument("-s","--sequencing_projects",required=True,nargs="+",help="The DNAnexus projects that contain the sequencing results.")
 parser.add_argument("-b","--barcodes-file",required=True,help="Text file containing one or more barcodes (one per line).")
-parser.add_argument("-t","--technical-replicates",required=True,type=int,help="The number of technical replicates for each sample (barcode). Each technical replicate should have the same barcode since it was sequenced multiple times - either on multiple lanes of the same flowcell, or different lanes of different flowcells, or both. This information is used to perform a check before running the workflow. The check asserts the following for each sample:
+parser.add_argument("-t","--technical-replicates",required=True,type=int,help="""The number of technical replicates for each sample (barcode). Each technical replicate should have the same barcode since it was sequenced multiple times - either on multiple lanes of the same flowcell, or different lanes of different flowcells, or both. This information is used to perform a check before running the workflow. The check asserts the following for each sample:
 	#forward_read_fiels == #num_reverse_read_files == #technical_replicates
-")
+""")
 
 args = parser.parse_args()
 genome = args.genome
