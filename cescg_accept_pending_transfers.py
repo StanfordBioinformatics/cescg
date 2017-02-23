@@ -35,6 +35,7 @@ fhandler = logging.FileHandler(filename=LOG_FILE,mode="a")
 fhandler.setLevel(logging.INFO)
 fhandler.setFormatter(formatter)
 logger.addHandler(fhandler)
+INTERNAL_HOLD_PROJ_PROP = "internal_hold"
 
 
 ORG = "org-cescg" #The DX org to bill each transferred project to.
@@ -73,6 +74,9 @@ for proj_id in transferred:
 		proj_id_name = "{proj_id} {proj_name}".format(proj_id=proj.id,proj_name=proj.name)
 		logger.info("Preparing to download {proj_id_name}.".format(proj_id_name=proj_id_name))
 		proj_properties = proj.describe(input_params={"properties": True})["properties"]
+		if INTERNAL_HOLD_PROJ_PROP in proj_properties:
+			if proj_properties[INTERNAL_HOLD_PROJ_PROP].lower().strip() == "true":
+				continue #don't download to SCHub at this time.
 		lab = proj_properties["lab"]
 		download_dir = os.path.join(OUTPUT_DIR,lab)
 		dxsr.download_project(download_dir=download_dir)
@@ -87,4 +91,4 @@ for proj_id in transferred:
 		logger.critical("Sending email with exception details to {}".format(ERROR_EMAILS))
 		subject = HOSTNAME + ":" + SCRIPT_NAME + " Error"
 		cmd = "echo {msg} | mail -s {subject} {TO}".format(msg=e.message,subject=subject,TO=ERROR_EMAILS)
-		subprocess.check_call(cmd=cmd,shell=True)	
+		subprocess.check_call(cmd,shell=True)	
