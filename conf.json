@@ -1,0 +1,23 @@
+{
+	"schub_pod": {
+		"dx_download_root": "/data/cirm/submit/stanford/Labs",
+		"logfile": "/data/cirm/submit/stanford/software/Log/log_cescg_accept_pending_transfers.txt"
+	},
+	"dx": {
+		"project_props": {
+			"lab": "lab",
+			"internal_hold": "internal_hold",
+			"scHub": "scHub"
+		},
+		"orgs": {
+			"cescg": {
+				"id": "org-cescg",
+				"admin": "nathankw",
+				"admin_email": "nathankw@stanford.edu",
+				"org_email": "cescg-scgpm-seqdata@lists.stanford.edu",
+				"error_emails": ["nathankw@stanford.edu","rvnair@stanford.edu"]
+			}
+		}
+	}
+}
+			
