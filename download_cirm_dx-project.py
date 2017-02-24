@@ -8,6 +8,7 @@
 ###
 
 import os
+import json
 import socket
 import sys
 import subprocess
@@ -21,32 +22,33 @@ import scgpm_seqresults_dnanexus.dnanexus_utils
 
 #The environment module gbsc/gbsc_dnanexus/current should also be loaded in order to log into DNAnexus
 
+conf_file = os.path.join(os.path.dirname(__file__),"conf.json")
+cfh = open(conf_file)
+conf = json.load(cfh)
+
 #GLOBALS
-INTERNAL_HOLD_PROJ_PROP = "internal_hold" #bool
-LAB_PROJ_PROP = "lab"
-SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP = "scHub"    #bool
-ERROR_EMAIL = ["nathankw@stanford.edu","rvnair@stanford.edu"] #Who to notify when downloading a transferred project fails.
-SUCCESS_EMAIL = "cescg-scgpm-seqdata@lists.stanford.edu" #Who to notify of each successfully transferred and downloaded project.
+DX_USER = conf["dx"]["orgs"]["cescg"]["admin"]
+DOWNLOAD_DIR = conf["schub_pod"]["dx_download_root"]
+LOG_FILE = conf["schub_pod"]["logfile"]
+INTERNAL_HOLD_PROJ_PROP = conf["dx"]["project_props"]["internal_hold"] #bool
+LAB_PROJ_PROP = conf["dx"]["project_props"]["lab"]
+SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP = conf["dx"]["project_props"]["scHub"]    #bool
+ERROR_EMAILS = conf["dx"]["orgs"]["cescg"]["error_emails"] #Who to notify when downloading a transferred project fails.
+SUCCESS_EMAIL = conf["dx"]["orgs"]["cescg"]["org_email"]  #Who to notify of each successfully transferred and downloaded project.
 HOSTNAME = socket.gethostname()
 DX_LOGIN_CONF = gbsc_dnanexus.CONF_FILE
 
 description = "Accepts DNAnexus projects pending transfer to the CESCG org, then downloads each of the projects to the local host at specified location."
 description += " For each successfull project download, an email will sent out to {addr} for notification,".format(addr=SUCCESS_EMAIL)
 description == " and in DNAnexus a project property will be added to the project; this property is {} and will be set to True to indicate that the project was downloaded to SCHub.".format(SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP)
-description += " For each download that fails, and email will be sent out to {addrs} for notification.".format(addrs=",".join(ERROR_EMAIL))
+description += " For each download that fails, and email will be sent out to {addrs} for notification.".format(addrs=",".join(ERROR_EMAILS))
 description += " See more details at https://docs.google.com/document/d/1ykBa2D7kCihzIdixiOFJiSSLqhISSlqiKGMurpW5A6s/edit?usp=sharing and https://docs.google.com/a/stanford.edu/document/d/1AxEqCr4dWyEPBfp2r8SMtz8YE_tTTme730LsT_3URdY/edit?usp=sharing."
 
 parser = argparse.ArgumentParser(description=description,formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('-u',"--dx-user-name",required=True,help="The DNAnexus login user name. An API token must have already been generated for this user and that token must have been added to the DNAnexus login configuration file located at {DX_LOGIN_CONF}.".format(DX_LOGIN_CONF=DX_LOGIN_CONF))
 parser.add_argument("-p","--dx-project-ids",required=True,nargs="+",help="One or more DNAnexus project IDs.")
-parser.add_argument("-d","--download-dir",required=True,help="The local directory in which to download each DNAnexus project. The path must already exist.")
-parser.add_argument("-l","--log",required=True,help="The log file to append to.")
 args = parser.parse_args()
 
-dx_username = args.dx_user_name
 proj_ids = args.dx_project_ids
-download_dir = args.download_dir
-log_file = args.log
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -56,17 +58,17 @@ chandler.setLevel(logging.INFO)
 chandler.setFormatter(formatter)
 logger.addHandler(chandler)
 
-fhandler = logging.FileHandler(filename=log_file,mode="a")
+fhandler = logging.FileHandler(filename=LOG_FILE,mode="a")
 fhandler.setLevel(logging.INFO)
 fhandler.setFormatter(formatter)
 logger.addHandler(fhandler)
 
-if not os.path.exists(download_dir):
-	raise Exception("Value to --download-dir ({dd}) does not exist!".format(dd=download_dir))
+if not os.path.exists(DOWNLOAD_DIR):
+	raise Exception("Value to --download-dir ({dd}) does not exist!".format(dd=DOWNLOAD_DIR))
 
 for proj_id in proj_ids:
 	try:
-		dxsr = scgpm_seqresults_dnanexus.dnanexus_utils.DxSeqResults(dx_username=dx_username,dx_project_id=proj_id,billing_account_id=ORG)
+		dxsr = scgpm_seqresults_dnanexus.dnanexus_utils.DxSeqResults(dx_username=DX_USER,dx_project_id=proj_id,billing_account_id=ORG)
 		proj = dxpy.DXProject(dxsr.dx_project_id)
 		proj_id_name = "{proj_id} {proj_name}".format(proj_id=proj.id,proj_name=proj.name)
 		logger.info("Preparing to download {proj_id_name}.".format(proj_id_name=proj_id_name))
@@ -75,7 +77,7 @@ for proj_id in proj_ids:
 			if proj_properties[INTERNAL_HOLD_PROJ_PROP].lower().strip() == "true":
 				continue #don't download to SCHub at this time.
 		lab = proj_properties[LAB_PROJ_PROP]
-		lab_download_dir = os.path.join(download_dir,lab)
+		lab_download_dir = os.path.join(DOWNLOAD_DIR,lab)
 		dxsr.download_project(download_dir=lab_download_dir)
 		body = "DNAnexus project {proj_id_name} for the {lab} lab has successfully been downloaded to {HOSTNAME}.".format(proj_id_name=proj_id_name,lab=lab,HOSTNAME=HOSTNAME)
 		logger.info(body)
@@ -86,7 +88,7 @@ for proj_id in proj_ids:
 		dxpy.api.project_set_properties(object_id=proj_id,input_params={"properties": proj_properties})
 	except Exception as e:
 		logger.exception(e.message)
-		logger.critical("Sending email with exception details to {}".format(ERROR_EMAIL))
+		logger.critical("Sending email with exception details to {}".format(ERROR_EMAILS))
 		subject = HOSTNAME + ":" + SCRIPT_NAME + " Error"
-		cmd = "echo {msg} | mail -s {subject} {TO}".format(msg=e.message,subject=subject,TO=ERROR_EMAIL)
+		cmd = "echo {msg} | mail -s {subject} {TO}".format(msg=e.message,subject=subject,TO=ERROR_EMAILS)
 		subprocess.check_call(cmd,shell=True)	
