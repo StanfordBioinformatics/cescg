@@ -77,11 +77,12 @@ for proj_id in proj_ids:
 		lab = proj_properties[LAB_PROJ_PROP]
 		lab_download_dir = os.path.join(download_dir,lab)
 		dxsr.download_project(download_dir=lab_download_dir)
-		body = "DNAnexus project {proj_id_name} for lab {lab} has successfully been downloaded to {HOSTNAME}.".format(proj_id_name=proj_id_name,lab=lab,HOSTNAME=HOSTNAME)
+		body = "DNAnexus project {proj_id_name} for the {lab} lab has successfully been downloaded to {HOSTNAME}.".format(proj_id_name=proj_id_name,lab=lab,HOSTNAME=HOSTNAME)
 		logger.info(body)
 		subject = "CESCG: New DNAnexus SeqResults for {proj_name}".format(proj_name=proj.name)
-		subprocess.check_call("echo {body} | mail -s {subject} {TO}".format(body=body,subject=subject,TO=SUCCESS_EMAIL))
-		proj_properties.update({SCHUB_DOWNLOAD_COMPLETE__PROJ_PROP:True})
+		cmd = "echo {body} | mail -s {subject} {TO}".format(body=body,subject=subject,TO=SUCCESS_EMAIL)
+		subprocess.check_call(cmd,shell=True)
+		proj_properties.update({SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP:True})
 		dxpy.api.project_set_properties(object_id=proj_id,input_params={"properties": proj_properties})
 	except Exception as e:
 		logger.exception(e.message)
