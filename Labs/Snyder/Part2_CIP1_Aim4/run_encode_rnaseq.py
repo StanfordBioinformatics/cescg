@@ -33,8 +33,7 @@ num_tech_reps = args.technical_replicates
 
 output_path = args.output_path
 if not output_path.startswith("/"):
-	output_path = "/" + output_path
-
+  output_path = "/" + output_path
 
 bfh = open(barcodes_file)
 barcodes = []
@@ -125,13 +124,13 @@ if set_diff:
 	raise Exception("Some barcodes not found: {set_diff}.".format(set_diff=set_diff))
 
 for barcode in barcodes_dico:
-	if barcode == "TCTCGCGC-GTCAGTAC":
-		continue #already run
 	print(barcode)
 	file_ids = barcodes_dico[barcode]
 	first_file_id = dxpy.DXFile(file_ids["forward"][0]) #doens't matter which file we pick from the file_ids list, as they all have the same lab_* props.
 	first_file_props = first_file_id.get_properties()
 	patient_id = first_file_props["lab_patient_id"]
+	patient_group = first_file_props["lab_patient_group"]
+	patient_condition = first_file_props["lab_patient_condition"]
 	if not patient_id:
 		raise Exception("Property 'lab_patient_id' not set for file {first_file_id}.".format(first_file_id=first_file_id))
 	forward_files = file_ids["forward"]
@@ -147,7 +146,8 @@ for barcode in barcodes_dico:
 	workflow_input = { "0.reads1":forward_files,"0.reads2":reverse_files,"0.star_index":encode_star_index,"1.chrom_sizes":chrom_sizes_file,"2.rsem_index":encode_rsem_index}
 	job_name = "_".join([patient_id,barcode,encode_long_rnaseq_wf.id])
 #		#run the wf
-	job_properties = {"lab_patient_id":patient_id,"barcode":barcode}
+
+	job_properties = {"lab_patient_id":patient_id,"lab_patient_group":patient_group,"lab_patient_condition": patient_condition,"barcode":barcode}
 	encode_long_rnaseq_wf.run(debug={"debugOn":["AppError","AppInternalError"]},workflow_input=workflow_input,project=working_proj,folder=destination_folder,name=job_name,properties=job_properties)
 #	break
 #		#cmd = "dx run --ssh --debug-on AppError,AppInternalError --destination {destination} " + encode_long_rnaseq_wfid + " -istage-BxFZK780VBPvq9FbXQFYz4gG.reads1={lane1_f} -istage-BxFZK780VBPvq9FbXQFYz4gG.reads1={lane5_f} \
