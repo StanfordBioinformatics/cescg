@@ -84,7 +84,7 @@ for proj_id in proj_ids:
 		body = "DNAnexus project {proj_id_name} for the {lab} lab has successfully been downloaded to {HOSTNAME}.".format(proj_id_name=proj_id_name,lab=lab,HOSTNAME=HOSTNAME)
 		logger.info(body)
 		subject = "CESCG: New DNAnexus SeqResults for {proj_name}".format(proj_name=proj.name)
-		cmd = "echo {body} | mail -s {subject} {TO}".format(body=body,subject=subject,TO=SUCCESS_EMAIL)
+		cmd = "echo {body} | mail -s \"{subject}\" \"{TO}\"".format(body=body,subject=subject,TO=SUCCESS_EMAIL)
 		subprocess.check_call(cmd,shell=True)
 		proj_properties.update({SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP:"true"})
 		dxpy.api.project_set_properties(object_id=proj_id,input_params={"properties": proj_properties})
