@@ -86,11 +86,11 @@ for proj_id in proj_ids:
 		subject = "CESCG: New DNAnexus SeqResults for {proj_name}".format(proj_name=proj.name)
 		cmd = "echo {body} | mail -s {subject} {TO}".format(body=body,subject=subject,TO=SUCCESS_EMAIL)
 		subprocess.check_call(cmd,shell=True)
-		proj_properties.update({SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP:True})
+		proj_properties.update({SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP:"true"})
 		dxpy.api.project_set_properties(object_id=proj_id,input_params={"properties": proj_properties})
 	except Exception as e:
 		logger.exception(e.message)
 		logger.critical("Sending email with exception details to {}".format(ERROR_EMAILS))
 		subject = HOSTNAME + ":" + SCRIPT_NAME + " Error"
-		cmd = "echo {msg} | mail -s {subject} {TO}".format(msg=e.message,subject=subject,TO=ERROR_EMAILS)
+		cmd = "echo {msg} | mail -s {subject} {TO}".format(msg=e.message,subject=subject,TO=" ".join(ERROR_EMAILS))
 		subprocess.check_call(cmd,shell=True)	
