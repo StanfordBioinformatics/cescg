@@ -92,5 +92,12 @@ for proj_id in proj_ids:
 		logger.exception(e.message)
 		logger.critical("Sending email with exception details to {}".format(ERROR_EMAILS))
 		subject = HOSTNAME + ":" + SCRIPT_NAME + ":" + proj_id + " Error"
-		cmd = "echo {msg} | mail -s \"{subject}\" \"{TO}\"".format(msg=e.message,subject=subject,TO=" ".join(ERROR_EMAILS))
+		err_message = e.message
+		if issubclass(e.__class__,EnvironmentError):
+			err_message = e.strerror
+			#EnvironmentError erros don't have a value set for the messages attribute. Instead, that value should be grabbed from the strerror attribute.
+			#As stated from the Python docs, EnvironmentError is the base class for exceptions that can occur outside the Python system: IOError, OSError. When exceptions of this type are created with a 2-tuple, 
+			# the first item is available on the instance's errno attribute (it is assumed to be an error number), and the second item is available on the strerror attribute
+			# (it is usually the associated error message). The tuple itself is also available on the args attribute.
+		cmd = "echo {msg} | mail -s \"{subject}\" \"{TO}\"".format(msg=err_message,subject=subject,TO=" ".join(ERROR_EMAILS))
 		subprocess.check_call(cmd,shell=True)	
