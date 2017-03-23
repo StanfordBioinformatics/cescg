@@ -28,6 +28,7 @@ conf = json.load(cfh)
 
 #GLOBALS
 DX_USER = conf["dx"]["orgs"]["cescg"]["admin"]
+DX_CESCG_ORG_ID = conf["dx"]["orgs"]["cescg"]["id"]
 DOWNLOAD_DIR = conf["schub_pod"]["dx_download_root"]
 LOG_FILE = conf["schub_pod"]["logfile"]
 INTERNAL_HOLD_PROJ_PROP = conf["dx"]["project_props"]["internal_hold"] #bool
@@ -38,7 +39,7 @@ SUCCESS_EMAIL = conf["dx"]["orgs"]["cescg"]["org_email"]  #Who to notify of each
 HOSTNAME = socket.gethostname()
 DX_LOGIN_CONF = gbsc_dnanexus.CONF_FILE
 
-description = "Accepts DNAnexus projects pending transfer to the CESCG org, then downloads each of the projects to the local host at specified location."
+description = "Downloads each of the specified DNAnexus projects to the local host at specified location."
 description += " For each successfull project download, an email will sent out to {addr} for notification,".format(addr=SUCCESS_EMAIL)
 description == " and in DNAnexus a project property will be added to the project; this property is {} and will be set to True to indicate that the project was downloaded to SCHub.".format(SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP)
 description += " For each download that fails, and email will be sent out to {addrs} for notification.".format(addrs=",".join(ERROR_EMAILS))
@@ -68,7 +69,7 @@ if not os.path.exists(DOWNLOAD_DIR):
 
 for proj_id in proj_ids:
 	try:
-		dxsr = scgpm_seqresults_dnanexus.dnanexus_utils.DxSeqResults(dx_username=DX_USER,dx_project_id=proj_id,billing_account_id=ORG)
+		dxsr = scgpm_seqresults_dnanexus.dnanexus_utils.DxSeqResults(dx_username=DX_USER,dx_project_id=proj_id,billing_account_id=DX_CESCG_ORG_ID)
 		proj = dxpy.DXProject(dxsr.dx_project_id)
 		proj_id_name = "{proj_id} {proj_name}".format(proj_id=proj.id,proj_name=proj.name)
 		logger.info("Preparing to download {proj_id_name}.".format(proj_id_name=proj_id_name))
