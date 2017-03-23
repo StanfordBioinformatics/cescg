@@ -91,6 +91,6 @@ for proj_id in proj_ids:
 	except Exception as e:
 		logger.exception(e.message)
 		logger.critical("Sending email with exception details to {}".format(ERROR_EMAILS))
-		subject = HOSTNAME + ":" + SCRIPT_NAME + " Error"
-		cmd = "echo {msg} | mail -s {subject} {TO}".format(msg=e.message,subject=subject,TO=" ".join(ERROR_EMAILS))
+		subject = HOSTNAME + ":" + SCRIPT_NAME + ":" + proj_id + " Error"
+		cmd = "echo {msg} | mail -s \"{subject}\" \"{TO}\"".format(msg=e.message,subject=subject,TO=" ".join(ERROR_EMAILS))
 		subprocess.check_call(cmd,shell=True)	
