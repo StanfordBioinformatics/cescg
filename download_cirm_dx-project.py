@@ -27,6 +27,7 @@ cfh = open(conf_file)
 conf = json.load(cfh)
 
 #GLOBALS
+SCRIPT_NAME = os.path.basename(sys.argv[0])
 DX_USER = conf["dx"]["orgs"]["cescg"]["admin"]
 DX_CESCG_ORG_ID = conf["dx"]["orgs"]["cescg"]["id"]
 DOWNLOAD_DIR = conf["schub_pod"]["dx_download_root"]
