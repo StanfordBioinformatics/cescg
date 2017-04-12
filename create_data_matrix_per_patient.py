@@ -14,7 +14,7 @@ import dxpy
 rsem_data_matrix_app = dxpy.DXApp(name="rsem-generate-data-matrix")
 
 
-description = "howdy"
+description = "Runs the DNAnexus App called rsem-generate-data-matrix that I wrote in order to create the gene and isoform quantification matrices for the various conditions of each patient."
 parser = argparse.ArgumentParser(description=description,formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("-p","--dx-project-id",required=True,help="The DNAnexus project ID of the project containing the analysis results from the star-rsem pipeline that outputs RSEM expression quantification files for genes and isoforms.")
 parser.add_argument("-f","--patient-folders-path",required=True,help="The folder path in the DNAnexus project specified by --dx-project-id that contains a folder for each patient. Each patient folder contains a folder per barcode/condition. It is assumed that the star-rsem analysis results are located here.")
@@ -24,9 +24,6 @@ args = parser.parse_args()
 dx_proj_id = args.dx_project_id
 patient_folder_path = args.patient_folders_path
 num_conditions = args.num_conditions
-
-dx_proj_id = "project-BxZpbXj0V610b5Q6x1FV80gb" #Joseph_Wu
-patient_folders_path = "/encode_long_rnaseq/part2_cip1_aim4/"
 
 p = dxpy.DXProject(dx_proj_id)
 patient_folders = p.list_folder(folder=patient_folders_path)["folders"]
