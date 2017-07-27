@@ -14,6 +14,7 @@ import sys
 import subprocess
 import logging
 import argparse
+import pdb
 
 import dxpy
 
@@ -41,7 +42,7 @@ HOSTNAME = socket.gethostname()
 DX_LOGIN_CONF = gbsc_dnanexus.CONF_FILE
 
 description = "Downloads each of the specified DNAnexus projects to the local host at specified location."
-description += " For each successfull project download, an email will sent out to {addr} for notification,".format(addr=SUCCESS_EMAIL)
+description += " For each successful project download, an email will sent out to {addr} for notification,".format(addr=SUCCESS_EMAIL)
 description == " and in DNAnexus a project property will be added to the project; this property is {} and will be set to True to indicate that the project was downloaded to SCHub.".format(SCHUB_DOWNLOAD_COMPLETE_PROJ_PROP)
 description += " For each download that fails, and email will be sent out to {addrs} for notification.".format(addrs=",".join(ERROR_EMAILS))
 description += " See more details at https://docs.google.com/document/d/1ykBa2D7kCihzIdixiOFJiSSLqhISSlqiKGMurpW5A6s/edit?usp=sharing and https://docs.google.com/a/stanford.edu/document/d/1AxEqCr4dWyEPBfp2r8SMtz8YE_tTTme730LsT_3URdY/edit?usp=sharing."
@@ -95,7 +96,7 @@ for proj_id in proj_ids:
 		err_message = e.message
 		if issubclass(e.__class__,EnvironmentError):
 			err_message = e.strerror
-			#EnvironmentError erros don't have a value set for the messages attribute. Instead, that value should be grabbed from the strerror attribute.
+			#EnvironmentError errors don't have a value set for the messages attribute. Instead, that value should be grabbed from the strerror attribute.
 			#As stated from the Python docs, EnvironmentError is the base class for exceptions that can occur outside the Python system: IOError, OSError. When exceptions of this type are created with a 2-tuple, 
 			# the first item is available on the instance's errno attribute (it is assumed to be an error number), and the second item is available on the strerror attribute
 			# (it is usually the associated error message). The tuple itself is also available on the args attribute.
