@@ -43,6 +43,13 @@ rsem_index = dxpy.dxlink(project_id=joseph_wu_dx_project_id,object_id="file-Bxyp
 def createFileDict(lane_objects):
 	"""
 	Args : lane_objects - a list of dicts of the form [{u'id': u'file-BvpGgv003gVbz7423x5kj480'}]
+  Returns : dict. Each key is a patient ID. The value is a dict with barcodes as keys. Each barcode key has a dict value, whose 
+            keys are:
+              1) forward, and 
+              2) reverse
+            The forward and reverse keys each have a dict as a value with keys being
+              1) dxid - The DNAnexus file ID, and 
+              2) name - The name of the file.
 	"""
 	dico = {}
 	for f in lane_objects:

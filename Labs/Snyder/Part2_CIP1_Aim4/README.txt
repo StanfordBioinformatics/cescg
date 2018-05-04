@@ -83,3 +83,10 @@ python run_encode_rnaseq.py -g hg19 -t 6 -d "encode_long_rnaseq/part2_cip1_aim4"
 #352 #1D	HCM	Carvedilol 0.1 µM	GAATTCGT-GTCAGTAC
 
 #I'll run the ENCODE Uniform Long RNA-Seq pipeline in the Joseph_Wu DNAnexus project (project-BxZpbXj0V610b5Q6x1FV80gb) and output the results in the same project and in the folder path Joseph_Wu/encode_long_rnaseq/part2_cip1_aim4. Within that folder, there will be a subfolder named after each patient ID, i.e. 287, and a sub-folder there-within named after the barcode. 
+
+2017-04-11
+I next ran the app I wrote called rsem-generate-data-matrix (version 0.1.0) on each of the 12 patients to generate both a gene results matrix and an isoforms results matrix on all 4 conditions per patient:
+	create_data_matrix_per_patient.py --dx-project-id=project-BxZpbXj0V610b5Q6x1FV80gb --num-conditions=4 --patient-folders-path="/encode_long_rnaseq/part2_cip1_aim4/"
+I output the matrices in the patient folders. 
+
+The output matrices in the patient folders (GeneMat.txt and IsoMat.txt) have the filenames as the field headers. The field names are all the same since the ENCODE star-rsem pipeline uses a common output name. Thus, I had to download all of 24 matrix files spanning the 12 patient folders, update the field headers using the barcode IDs, and then upload them back to DNAnexus. The download files are local here as well in the RSEM_Matrices folder.
